@@ -19,9 +19,19 @@ export async function GET() {
     return NextResponse.json(shipments, { status: 200 })
   } catch (error) {
     console.error('Error fetching shipments:', error)
+
+    // Check if it's an authentication error
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Please log in to view shipments' },
+        { status: 401 }
+      )
+    }
+
+    // Other errors
     return NextResponse.json(
-      { error: 'Unauthorized or internal server error' },
-      { status: 401 }
+      { error: 'Internal server error', message: 'Failed to fetch shipments' },
+      { status: 500 }
     )
   }
 }
@@ -71,9 +81,19 @@ export async function POST(request: Request) {
     return NextResponse.json(shipment, { status: 201 })
   } catch (error) {
     console.error('Error creating shipment:', error)
+
+    // Check if it's an authentication error
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Please log in to create shipments' },
+        { status: 401 }
+      )
+    }
+
+    // Other errors
     return NextResponse.json(
-      { error: 'Unauthorized or internal server error' },
-      { status: 401 }
+      { error: 'Internal server error', message: 'Failed to create shipment' },
+      { status: 500 }
     )
   }
 }

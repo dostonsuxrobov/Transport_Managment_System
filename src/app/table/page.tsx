@@ -47,13 +47,24 @@ export default function TablePage() {
   const fetchShipments = async () => {
     try {
       const response = await fetch("/api/shipments")
-      if (!response.ok) {
-        throw new Error("Failed to fetch shipments")
+
+      // Handle authentication errors
+      if (response.status === 401) {
+        console.error("Authentication required - redirecting to login")
+        window.location.href = "/login"
+        return
       }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Failed to fetch shipments" }))
+        throw new Error(errorData.message || "Failed to fetch shipments")
+      }
+
       const data = await response.json()
       setShipments(data)
     } catch (error) {
       console.error("Error fetching shipments:", error)
+      setError(error instanceof Error ? error.message : "Failed to fetch shipments")
     } finally {
       setIsLoading(false)
     }
@@ -76,10 +87,17 @@ export default function TablePage() {
         body: JSON.stringify(formData),
       })
 
+      // Handle authentication errors
+      if (response.status === 401) {
+        console.error("Authentication required - redirecting to login")
+        window.location.href = "/login"
+        return
+      }
+
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || "Failed to create shipment")
+        setError(data.message || data.error || "Failed to create shipment")
         setIsSubmitting(false)
         return
       }
@@ -96,7 +114,7 @@ export default function TablePage() {
       })
       fetchShipments()
     } catch (err) {
-      setError("Something went wrong")
+      setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {
       setIsSubmitting(false)
     }
@@ -117,10 +135,17 @@ export default function TablePage() {
         body: JSON.stringify(formData),
       })
 
+      // Handle authentication errors
+      if (response.status === 401) {
+        console.error("Authentication required - redirecting to login")
+        window.location.href = "/login"
+        return
+      }
+
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || "Failed to update shipment")
+        setError(data.message || data.error || "Failed to update shipment")
         setIsSubmitting(false)
         return
       }
@@ -129,7 +154,7 @@ export default function TablePage() {
       setEditingShipment(null)
       fetchShipments()
     } catch (err) {
-      setError("Something went wrong")
+      setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {
       setIsSubmitting(false)
     }
@@ -144,8 +169,17 @@ export default function TablePage() {
         method: "DELETE",
       })
 
+      // Handle authentication errors
+      if (response.status === 401) {
+        console.error("Authentication required - redirecting to login")
+        window.location.href = "/login"
+        return
+      }
+
       if (response.ok) {
         fetchShipments()
+      } else {
+        console.error("Failed to delete shipment")
       }
     } catch (err) {
       console.error("Error deleting shipment:", err)
