@@ -229,7 +229,7 @@ export default function TablePage() {
         <label htmlFor="status" className="text-sm font-medium">Status *</label>
         <select
           id="status"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           value={formData.status}
           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
           required
@@ -297,7 +297,7 @@ export default function TablePage() {
                 New Shipment
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create New Shipment</DialogTitle>
                 <DialogDescription>
@@ -462,7 +462,7 @@ export default function TablePage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Shipment</DialogTitle>
             <DialogDescription>
