@@ -28,9 +28,17 @@ export async function GET() {
       )
     }
 
-    // Other errors
+    // Log detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Detailed error:', errorMessage)
+
+    // Other errors - include more details in development
     return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to fetch shipments' },
+      {
+        error: 'Internal server error',
+        message: 'Failed to fetch shipments',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
@@ -90,9 +98,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // Other errors
+    // Log detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Detailed error:', errorMessage)
+
+    // Other errors - include more details in development
     return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to create shipment' },
+      {
+        error: 'Internal server error',
+        message: 'Failed to create shipment',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }

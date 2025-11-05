@@ -46,6 +46,7 @@ export default function TablePage() {
   // Fetch shipments
   const fetchShipments = async () => {
     try {
+      setError("") // Clear any previous errors
       const response = await fetch("/api/shipments")
 
       // Handle authentication errors
@@ -57,14 +58,18 @@ export default function TablePage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: "Failed to fetch shipments" }))
-        throw new Error(errorData.message || "Failed to fetch shipments")
+        const errorMessage = errorData.message || errorData.error || "Failed to fetch shipments"
+        const detailsMessage = errorData.details ? ` (${errorData.details})` : ""
+        throw new Error(`${errorMessage}${detailsMessage}`)
       }
 
       const data = await response.json()
       setShipments(data)
+      setError("") // Clear error on success
     } catch (error) {
       console.error("Error fetching shipments:", error)
-      setError(error instanceof Error ? error.message : "Failed to fetch shipments")
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch shipments"
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -342,6 +347,27 @@ export default function TablePage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Error Display */}
+            {error && (
+              <div className="p-4 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md flex items-start justify-between gap-2">
+                <div className="flex-1">
+                  <p className="font-medium">Error loading shipments</p>
+                  <p className="mt-1">{error}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setError("")
+                    setIsLoading(true)
+                    fetchShipments()
+                  }}
+                >
+                  Retry
+                </Button>
+              </div>
+            )}
+
             {/* Search */}
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -358,6 +384,10 @@ export default function TablePage() {
             {/* Table */}
             {isLoading ? (
               <div className="text-center py-8">Loading shipments...</div>
+            ) : error ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Unable to load shipments. Please try again.
+              </div>
             ) : filteredShipments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 {shipments.length === 0 ? "No shipments yet. Create your first shipment!" : "No shipments found matching your search."}

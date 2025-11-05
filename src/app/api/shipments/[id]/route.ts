@@ -37,9 +37,17 @@ export async function GET(
       )
     }
 
-    // Other errors
+    // Log detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Detailed error:', errorMessage)
+
+    // Other errors - include more details in development
     return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to fetch shipment' },
+      {
+        error: 'Internal server error',
+        message: 'Failed to fetch shipment',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
@@ -112,9 +120,17 @@ export async function PUT(
       )
     }
 
-    // Other errors
+    // Log detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Detailed error:', errorMessage)
+
+    // Other errors - include more details in development
     return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to update shipment' },
+      {
+        error: 'Internal server error',
+        message: 'Failed to update shipment',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
@@ -164,9 +180,17 @@ export async function DELETE(
       )
     }
 
-    // Other errors
+    // Log detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Detailed error:', errorMessage)
+
+    // Other errors - include more details in development
     return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to delete shipment' },
+      {
+        error: 'Internal server error',
+        message: 'Failed to delete shipment',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
