@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Search, Filter, Download, Plus, Pencil, Trash2 } from "lucide-react"
+import { initializeStorage, getShipments, createShipment, updateShipment, deleteShipment, getCurrentUser } from "@/lib/clientStorage"
 
 interface Shipment {
   id: string
@@ -44,28 +45,21 @@ export default function TablePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Fetch shipments
-  const fetchShipments = async () => {
+  const fetchShipments = () => {
     try {
-      setError("") // Clear any previous errors
-      const response = await fetch("/api/shipments")
+      setError("")
+      initializeStorage()
 
-      // Handle authentication errors
-      if (response.status === 401) {
-        console.error("Authentication required - redirecting to login")
+      // Check if user is logged in
+      const currentUser = getCurrentUser()
+      if (!currentUser) {
         window.location.href = "/login"
         return
       }
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Failed to fetch shipments" }))
-        const errorMessage = errorData.message || errorData.error || "Failed to fetch shipments"
-        const detailsMessage = errorData.details ? ` (${errorData.details})` : ""
-        throw new Error(`${errorMessage}${detailsMessage}`)
-      }
-
-      const data = await response.json()
+      const data = getShipments()
       setShipments(data)
-      setError("") // Clear error on success
+      setError("")
     } catch (error) {
       console.error("Error fetching shipments:", error)
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch shipments"
@@ -86,23 +80,18 @@ export default function TablePage() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("/api/shipments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const newShipment = createShipment({
+        trackingId: formData.trackingId,
+        origin: formData.origin,
+        destination: formData.destination,
+        status: formData.status,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        dimensions: formData.dimensions || null,
+        description: formData.description || null,
       })
 
-      // Handle authentication errors
-      if (response.status === 401) {
-        console.error("Authentication required - redirecting to login")
-        window.location.href = "/login"
-        return
-      }
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || data.error || "Failed to create shipment")
+      if (!newShipment) {
+        setError("Failed to create shipment. Tracking ID might already exist.")
         setIsSubmitting(false)
         return
       }
@@ -134,23 +123,18 @@ export default function TablePage() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`/api/shipments/${editingShipment.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const updated = updateShipment(editingShipment.id, {
+        trackingId: formData.trackingId,
+        origin: formData.origin,
+        destination: formData.destination,
+        status: formData.status,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        dimensions: formData.dimensions || null,
+        description: formData.description || null,
       })
 
-      // Handle authentication errors
-      if (response.status === 401) {
-        console.error("Authentication required - redirecting to login")
-        window.location.href = "/login"
-        return
-      }
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || data.error || "Failed to update shipment")
+      if (!updated) {
+        setError("Failed to update shipment")
         setIsSubmitting(false)
         return
       }
@@ -170,18 +154,8 @@ export default function TablePage() {
     if (!confirm("Are you sure you want to delete this shipment?")) return
 
     try {
-      const response = await fetch(`/api/shipments/${id}`, {
-        method: "DELETE",
-      })
-
-      // Handle authentication errors
-      if (response.status === 401) {
-        console.error("Authentication required - redirecting to login")
-        window.location.href = "/login"
-        return
-      }
-
-      if (response.ok) {
+      const success = deleteShipment(id)
+      if (success) {
         fetchShipments()
       } else {
         console.error("Failed to delete shipment")

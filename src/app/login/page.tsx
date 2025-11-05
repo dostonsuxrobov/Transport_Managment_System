@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,13 +8,19 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Truck } from "lucide-react"
+import { initializeStorage, login } from "@/lib/clientStorage"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("demo@example.com")
+  const [password, setPassword] = useState("demo123")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    // Initialize storage on mount
+    initializeStorage()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,18 +28,10 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      const user = login(email, password)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || "Login failed")
+      if (!user) {
+        setError("Invalid credentials")
         setIsLoading(false)
         return
       }
@@ -63,6 +61,13 @@ export default function LoginPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="p-3 text-sm bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md">
+            <p className="font-semibold mb-1">Demo Mode</p>
+            <p className="text-xs text-muted-foreground">
+              Email: demo@example.com<br />
+              Password: demo123
+            </p>
+          </div>
           <form className="space-y-4" onSubmit={handleSubmit}>
             {error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { useTheme } from "next-themes"
+import { logout } from "@/lib/clientStorage"
 
 export function Header() {
   const { theme, setTheme } = useTheme()
@@ -23,9 +24,7 @@ export function Header() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      })
+      logout()
       router.push("/login")
       router.refresh()
     } catch (error) {
