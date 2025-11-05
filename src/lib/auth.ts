@@ -20,7 +20,24 @@ export async function verifyAuth(): Promise<JWTPayload | null> {
 
   try {
     const verified = await jwtVerify(token, secret)
-    return verified.payload as JWTPayload
+    const payload = verified.payload
+
+    // Validate that the payload has the required fields
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      'userId' in payload &&
+      'email' in payload &&
+      typeof payload.userId === 'string' &&
+      typeof payload.email === 'string'
+    ) {
+      return {
+        userId: payload.userId,
+        email: payload.email,
+      }
+    }
+
+    return null
   } catch (error) {
     console.error('Token verification failed:', error)
     return null

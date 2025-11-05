@@ -28,9 +28,19 @@ export async function GET(
     return NextResponse.json(shipment, { status: 200 })
   } catch (error) {
     console.error('Error fetching shipment:', error)
+
+    // Check if it's an authentication error
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Please log in to view shipment' },
+        { status: 401 }
+      )
+    }
+
+    // Other errors
     return NextResponse.json(
-      { error: 'Unauthorized or internal server error' },
-      { status: 401 }
+      { error: 'Internal server error', message: 'Failed to fetch shipment' },
+      { status: 500 }
     )
   }
 }
@@ -93,9 +103,19 @@ export async function PUT(
     return NextResponse.json(shipment, { status: 200 })
   } catch (error) {
     console.error('Error updating shipment:', error)
+
+    // Check if it's an authentication error
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Please log in to update shipment' },
+        { status: 401 }
+      )
+    }
+
+    // Other errors
     return NextResponse.json(
-      { error: 'Unauthorized or internal server error' },
-      { status: 401 }
+      { error: 'Internal server error', message: 'Failed to update shipment' },
+      { status: 500 }
     )
   }
 }
@@ -135,9 +155,19 @@ export async function DELETE(
     )
   } catch (error) {
     console.error('Error deleting shipment:', error)
+
+    // Check if it's an authentication error
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Please log in to delete shipment' },
+        { status: 401 }
+      )
+    }
+
+    // Other errors
     return NextResponse.json(
-      { error: 'Unauthorized or internal server error' },
-      { status: 401 }
+      { error: 'Internal server error', message: 'Failed to delete shipment' },
+      { status: 500 }
     )
   }
 }
