@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Truck } from "lucide-react"
+import { initializeStorage, register } from "@/lib/clientStorage"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -18,6 +19,11 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    // Initialize storage on mount
+    initializeStorage()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,41 +43,18 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          name: `${firstName} ${lastName}`.trim(),
-        }),
-      })
+      const name = `${firstName} ${lastName}`.trim()
+      const user = register(email, password, name)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || "Registration failed")
+      if (!user) {
+        setError("User already exists with this email")
         setIsLoading(false)
         return
       }
 
-      // Auto-login after registration
-      const loginResponse = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (loginResponse.ok) {
-        router.push("/")
-        router.refresh()
-      } else {
-        router.push("/login")
-      }
+      // Redirect to dashboard after registration
+      router.push("/")
+      router.refresh()
     } catch (err) {
       setError("Something went wrong. Please try again.")
       setIsLoading(false)

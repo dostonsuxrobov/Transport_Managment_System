@@ -1,24 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Transport Management System
+
+A modern transport and logistics management system built with Next.js, designed for tracking shipments, managing fleets, and monitoring deliveries.
+
+## Live Demo
+
+The application is deployed on GitHub Pages and can be accessed at:
+[https://dostonsuxrobov.github.io/Transport_Managment_System/](https://dostonsuxrobov.github.io/Transport_Managment_System/)
+
+### Demo Credentials
+- **Email:** demo@example.com
+- **Password:** demo123
+
+## Features
+
+- **Shipment Tracking:** Create, update, and track shipments in real-time
+- **Dashboard:** Overview of key metrics and statistics
+- **User Authentication:** Secure login and registration system
+- **Dark/Light Mode:** Toggle between themes
+- **Responsive Design:** Works seamlessly on desktop and mobile devices
+- **Static Deployment:** Fully static site using client-side storage (localStorage)
+
+## GitHub Pages Deployment
+
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+
+### How it works:
+1. The app is built as a static export using Next.js
+2. All data is stored in browser localStorage (no backend required)
+3. GitHub Actions automatically builds and deploys on push to main branch
+4. The site is served from the `out` directory
+
+### Manual Deployment:
+```bash
+npm run build  # Build static export
+# The output will be in the 'out' directory
+```
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
 
