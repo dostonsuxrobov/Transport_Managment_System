@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Bell, Search, Settings, Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +19,19 @@ import { useTheme } from "next-themes"
 
 export function Header() {
   const { theme, setTheme } = useTheme()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+      router.push("/login")
+      router.refresh()
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
+  }
 
   return (
     <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -106,7 +120,7 @@ export function Header() {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Team</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
